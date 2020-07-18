@@ -49,55 +49,88 @@ import com.sovworks.eds.fs.std.StdFsFileIO;
 import com.sovworks.eds.fs.util.PathUtil;
 import com.sovworks.eds.truecrypt.FormatInfo;
 import com.sovworks.eds.truecrypt.StdLayout;
+import org.springframework.boot.Banner;
+import org.springframework.boot.CommandLineRunner;
 
 import com.sovworks.eds.fs.Path;
-
+import org.apache.commons.cli.*;
 @SpringBootApplication
-public class Demo1Application {
+public class EncReaderApplication implements CommandLineRunner {
 
-public static void main(String[] args) {
+	public static void main(String[] args) {
 
-		SpringApplication.run(Demo1Application.class, args);
-		
-		
-		
-		System.out.println("workin sg 123 check");
-		
-/*		
 		try {
-			
-			InputStream is = new ClassPathResource("libedsaes.so").getInputStream();	
-			byte[] buffer = new byte[1024];
-			int length;
-			File templibedsaes = File.createTempFile("libedsaes", ".so");
-			OutputStream os = new FileOutputStream(templibedsaes);	
-			while ((length = is.read(buffer)) != -1) {
-				os.write(buffer, 0, length);
-			}
-			is.close();
-			os.close();			
-			System.load(templibedsaes.getAbsolutePath());
-			templibedsaes.deleteOnExit();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SpringApplication app = new SpringApplication(EncReaderApplication.class);
+			app.setBannerMode(Banner.Mode.OFF);
+			app.run(args);
+		}catch(Exception e) {
 		}
-*/
-		
-		
+	}
 
-	
-		// public StdFsFileIO(File f,AccessMode mode) throws IOException
+	@Override
+	public void run(String[] args) {
+				
+		Options options = new Options();
+		
+        Option c = new Option("f", "file", true, "container path");
+        c.setRequired(true);
+        options.addOption(c);
+
+        Option pw = new Option("pw", "password", true, "password");
+        pw.setRequired(true);
+        options.addOption(pw);
+        
+        Option openfile = new Option("of", "openfile", true, "open file");
+        openfile.setRequired(false);
+        options.addOption(openfile);
+        
+        Option opendir = new Option("od", "opendir", true, "open dir");
+        opendir.setRequired(false);
+        options.addOption(opendir);
+        
+        Option help = new Option("h", "help", false, "Help");
+        help.setRequired(false);
+        options.addOption(help);
+        CommandLineParser parser = new ExtendedParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+     
+        try {
+        	 cmd = parser.parse(options, args, false);
+        	 	if(cmd.hasOption("help")) {
+        	        formatter.printHelp("Encryption Utility", options);
+                    System.exit(1);
+        	 	}
+        	    String container = cmd.getOptionValue("file");
+                String password = cmd.getOptionValue("password");
+                String of = cmd.getOptionValue("openfile");
+                String od = cmd.getOptionValue("opendir");
+               
+                if(of != null) {
+                	System.out.println("open file");
+            		this.doWork(container, password, of, "openfile");
+                }else if(od != null) {
+                	System.out.println("open directory");
+              		this.doWork(container, password, od, "opendir");
+                } else if(of == null && od == null) {
+                	System.out.println("open root directory");
+              		this.doWork(container, password, "/", "opendir");
+                }
+         } catch (org.apache.commons.cli.ParseException e) {
+            System.out.println(e.getMessage());
+            formatter.printHelp("Encryption Utility", options);
+            System.exit(1);
+        }
+	}
+
+	private void doWork(String container, String password, String target, String action) {
+
+		System.out.println("Starting");
 
 		RandomAccessIO io;
-
 		StdFs stdFs = StdFs.getStdFs();
-
 		EdsContainer cnt; // = null;
-
-		
 		try {
-
 			StdLayout stdl = new StdLayout();
 			stdl.initNew();
 			io = new StdFsFileIO(new File("/home/rab/shared/tcontainers/con1"), AccessMode.Read);
@@ -155,7 +188,6 @@ public static void main(String[] args) {
 
 					Contents dirReader = fd.list();
 
-				
 					for (Path p : dirReader) {
 						FatFS.FatDirectory fdtemp = ffs.new FatDirectory((FatPath) p);
 						System.out.print(fdtemp.getName() + "\t");
@@ -207,7 +239,6 @@ public static void main(String[] args) {
 			e1.printStackTrace();
 		}
 
-	
 		try {
 			// cw.open();
 			System.out.println("\nworking");
@@ -217,6 +248,5 @@ public static void main(String[] args) {
 			e.printStackTrace();
 		}
 
-	
 	}
 }
