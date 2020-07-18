@@ -2,7 +2,13 @@ package com.sovworks.eds.fs.util;
 
 import com.sovworks.eds.fs.RandomAccessIO;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.springframework.core.io.ClassPathResource;
 
 @SuppressWarnings("JniMissingFunction")
 public class FDRandomAccessIO implements RandomAccessIO
@@ -131,7 +137,25 @@ public class FDRandomAccessIO implements RandomAccessIO
 	
 	static
 	{
-		System.loadLibrary("fdraio");
+		//System.loadLibrary("fdraio");
+		try {
+
+			InputStream is = new ClassPathResource("libfdraio.so").getInputStream();
+			byte[] buffer = new byte[1024];
+			int length;
+			File templibfdraio = File.createTempFile("libfdraio", ".so");
+			OutputStream os = new FileOutputStream(templibfdraio);
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+			System.load(templibfdraio.getAbsolutePath());
+			templibfdraio.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private static native void flush(int fd);

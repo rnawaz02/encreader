@@ -60,9 +60,10 @@ public static void main(String[] args) {
 		SpringApplication.run(Demo1Application.class, args);
 		
 		
+		
 		System.out.println("workin sg 123 check");
 		
-		
+/*		
 		try {
 			
 			InputStream is = new ClassPathResource("libedsaes.so").getInputStream();	
@@ -74,44 +75,18 @@ public static void main(String[] args) {
 				os.write(buffer, 0, length);
 			}
 			is.close();
-			os.close();
-			
+			os.close();			
 			System.load(templibedsaes.getAbsolutePath());
 			templibedsaes.deleteOnExit();
-			
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+*/
 		
 		
 
-	/*
-		Resource  resource = Demo1Application.appContext.getResource("classpath:libedsaes.so");  
-		byte[] buffer = new byte[1024];
-		int length;
-		try {
-			
-			File file = resource.getFile(); //ResourceUtils.getFile("classpath:libedsaes.so");
-			InputStream is = new FileInputStream(file);
-				
-			File templibedsaes = File.createTempFile("libedsaes", ".so");
-			OutputStream os = new FileOutputStream(templibedsaes);	
-			while ((length = is.read(buffer)) != -1) {
-				os.write(buffer, 0, length);
-			}
-			System.load(templibedsaes.getAbsolutePath());
-			templibedsaes.deleteOnExit();
-
-			is.close();
-			os.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+	
 		// public StdFsFileIO(File f,AccessMode mode) throws IOException
 
 		RandomAccessIO io;
@@ -242,6 +217,6 @@ public static void main(String[] args) {
 			e.printStackTrace();
 		}
 
-	*/
+	
 	}
 }

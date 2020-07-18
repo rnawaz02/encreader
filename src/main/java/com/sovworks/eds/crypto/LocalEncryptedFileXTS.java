@@ -1,7 +1,12 @@
 package com.sovworks.eds.crypto;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.springframework.core.io.ClassPathResource;
 
 import com.sovworks.eds.crypto.modes.XTS;
 import com.sovworks.eds.fs.RandomAccessIO;
@@ -125,7 +130,27 @@ public class LocalEncryptedFileXTS implements RandomAccessIO
 	
 	static
 	{
-		System.loadLibrary("localxts");
+		//System.loadLibrary("localxts");
+		
+try {
+			
+			InputStream is = new ClassPathResource("liblocalxts.so").getInputStream();	
+			byte[] buffer = new byte[1024];
+			int length;
+			File templiblocalxts = File.createTempFile("liblocalxts", ".so");
+			OutputStream os = new FileOutputStream(templiblocalxts);	
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();			
+			System.load(templiblocalxts.getAbsolutePath());
+			templiblocalxts.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private static native void flush(long contextPointer);

@@ -6,8 +6,15 @@ import com.sovworks.eds.crypto.EncryptionEngine;
 import com.sovworks.eds.crypto.EncryptionEngineException;
 //import com.sovworks.eds.crypto.SecureBuffer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.springframework.core.io.ClassPathResource;
 
 //@SuppressWarnings("WeakerAccess")
 public abstract class CTR implements EncryptionEngine
@@ -129,7 +136,25 @@ public abstract class CTR implements EncryptionEngine
 
 	static
 	{
-		System.loadLibrary("edsctr");
+		//System.loadLibrary("edsctr");
+		try {
+
+			InputStream is = new ClassPathResource("libedsctr.so").getInputStream();
+			byte[] buffer = new byte[1024];
+			int length;
+			File templibedsctr = File.createTempFile("libedsctr", ".so");
+			OutputStream os = new FileOutputStream(templibedsctr);
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+			System.load(templibedsctr.getAbsolutePath());
+			templibedsctr.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected byte[] _iv;

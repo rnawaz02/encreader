@@ -1,6 +1,15 @@
 package com.sovworks.eds.crypto.blockciphers;
 
 import com.sovworks.eds.crypto.EncryptionEngineException;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.springframework.core.io.ClassPathResource;
+
 import com.sovworks.eds.crypto.BlockCipherNative;
 
 
@@ -60,7 +69,25 @@ public class Serpent implements BlockCipherNative
 	
 	static
 	{
-		System.loadLibrary("edsserpent");
+		//System.loadLibrary("edsserpent");
+		try {
+
+			InputStream is = new ClassPathResource("libedsserpent.so").getInputStream();
+			byte[] buffer = new byte[1024];
+			int length;
+			File templibedsserpent = File.createTempFile("libedsserpent", ".so");
+			OutputStream os = new FileOutputStream(templibedsserpent);
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+			System.load(templibedsserpent.getAbsolutePath());
+			templibedsserpent.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private long _contextPtr;

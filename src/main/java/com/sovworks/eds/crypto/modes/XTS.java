@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 
 
@@ -166,24 +167,19 @@ public abstract class XTS implements FileEncryptionEngine
 	static
 	{
 		//System.loadLibrary("edsxts");
-		
-		byte[] buffer = new byte[1024];
-		int length;
-		try {
-			
-			File file = ResourceUtils.getFile("classpath:lib/libedsxts.so");
-			InputStream is = new FileInputStream(file);
-				
+		try {	
+			InputStream is = new ClassPathResource("libedsxts.so").getInputStream();	
+			byte[] buffer = new byte[1024];
+			int length;
 			File templibedsxts = File.createTempFile("libedsxts", ".so");
 			OutputStream os = new FileOutputStream(templibedsxts);	
 			while ((length = is.read(buffer)) != -1) {
 				os.write(buffer, 0, length);
 			}
+			is.close();
+			os.close();			
 			System.load(templibedsxts.getAbsolutePath());
 			templibedsxts.deleteOnExit();
-
-			is.close();
-			os.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,6 +1,13 @@
 package com.sovworks.eds.crypto.hash;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
+
+import org.springframework.core.io.ClassPathResource;
 
 public class Whirlpool extends MessageDigest
 {
@@ -61,7 +68,24 @@ public class Whirlpool extends MessageDigest
 	
 	static
 	{
-		System.loadLibrary("edswhirlpool");
+		//System.loadLibrary("edswhirlpool");
+		try {	
+			InputStream is = new ClassPathResource("libedswhirlpool.so").getInputStream();	
+			byte[] buffer = new byte[1024];
+			int length;
+			File templibedswhirlpool = File.createTempFile("libedswhirlpool", ".so");
+			OutputStream os = new FileOutputStream(templibedswhirlpool);	
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();			
+			System.load(templibedswhirlpool.getAbsolutePath());
+			templibedswhirlpool.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private static final int DIGEST_LENGTH = 64;

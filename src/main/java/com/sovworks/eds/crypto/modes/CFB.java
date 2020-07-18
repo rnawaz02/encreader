@@ -5,8 +5,15 @@ import com.sovworks.eds.crypto.CipherFactory;
 import com.sovworks.eds.crypto.EncryptionEngine;
 import com.sovworks.eds.crypto.EncryptionEngineException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.springframework.core.io.ClassPathResource;
 
 public abstract class CFB implements EncryptionEngine
 {
@@ -127,7 +134,25 @@ public abstract class CFB implements EncryptionEngine
 
 	static
 	{
-		System.loadLibrary("edscfb");
+		//System.loadLibrary("edscfb");
+		try {
+
+			InputStream is = new ClassPathResource("libedscfb.so").getInputStream();
+			byte[] buffer = new byte[1024];
+			int length;
+			File templibedscfb = File.createTempFile("libedscfb", ".so");
+			OutputStream os = new FileOutputStream(templibedscfb);
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+			System.load(templibedscfb.getAbsolutePath());
+			templibedscfb.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	protected byte[] _iv;

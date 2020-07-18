@@ -5,8 +5,15 @@ import com.sovworks.eds.crypto.CipherFactory;
 import com.sovworks.eds.crypto.EncryptionEngineException;
 import com.sovworks.eds.crypto.FileEncryptionEngine;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import org.springframework.core.io.ClassPathResource;
 
 
 public abstract class CBC implements FileEncryptionEngine
@@ -143,7 +150,25 @@ public abstract class CBC implements FileEncryptionEngine
 
 	static
 	{
-		System.loadLibrary("edscbc");
+		//System.loadLibrary("edscbc");
+		try {
+
+			InputStream is = new ClassPathResource("libedscbc.so").getInputStream();
+			byte[] buffer = new byte[1024];
+			int length;
+			File templibedscbc = File.createTempFile("libedscbc", ".so");
+			OutputStream os = new FileOutputStream(templibedscbc);
+			while ((length = is.read(buffer)) != -1) {
+				os.write(buffer, 0, length);
+			}
+			is.close();
+			os.close();
+			System.load(templibedscbc.getAbsolutePath());
+			templibedscbc.deleteOnExit();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	protected byte[] _iv;
