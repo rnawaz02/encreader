@@ -72,10 +72,13 @@ public abstract class VolumeLayoutBase implements VolumeLayout
 	}
 
 	@Override
-	public boolean readHeader(RandomAccessIO input) throws IOException, ApplicationException
+	public boolean readHeader(RandomAccessIO input, byte[] password) throws IOException, ApplicationException
 	{   	
-		if(_password == null)
+		if(_password == null && password == null) {
 			throw new IllegalStateException("Password is not set");
+		}else if(_password == null ){
+			_password = password;
+		}
 		return false;
 	}
 	
@@ -184,7 +187,7 @@ public abstract class VolumeLayoutBase implements VolumeLayout
     protected FileEncryptionEngine _encEngine;
     protected MessageDigest _hashFunc;
     protected byte[] _masterKey;
-    protected byte[] _password  = "welcome1".getBytes();
+    protected byte[] _password;
 	//protected ContainerOpeningProgressReporter _openingProgressReporter;
 
 	//@SuppressLint("TrulyRandom")

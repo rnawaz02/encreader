@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -72,7 +73,7 @@ public class EncReaderApplication implements CommandLineRunner {
 				
 		Options options = new Options();
 		
-        Option c = new Option("f", "file", true, "container path");
+        Option c = new Option("f", "file", true, "absolute container path on the file system");
         c.setRequired(true);
         options.addOption(c);
 
@@ -80,11 +81,11 @@ public class EncReaderApplication implements CommandLineRunner {
         pw.setRequired(true);
         options.addOption(pw);
         
-        Option openfile = new Option("of", "openfile", true, "open file");
+        Option openfile = new Option("of", "openfile", true, "absolute file path inside container");
         openfile.setRequired(false);
         options.addOption(openfile);
         
-        Option opendir = new Option("od", "opendir", true, "open dir");
+        Option opendir = new Option("od", "opendir", true, "absolute directory path inside container");
         opendir.setRequired(false);
         options.addOption(opendir);
         
@@ -107,15 +108,18 @@ public class EncReaderApplication implements CommandLineRunner {
                 String od = cmd.getOptionValue("opendir");
                
                 if(of != null) {
-                	System.out.println("open file");
-            		this.doWork(container, password, of, "openfile");
+                	//System.out.println("open file");
+            		this.doWork(container, password.getBytes(), of, "openfile");
                 }else if(od != null) {
-                	System.out.println("open directory");
-              		this.doWork(container, password, od, "opendir");
+                	//System.out.println("open directory");
+              		this.doWork(container, password.getBytes(), od, "opendir");
                 } else if(of == null && od == null) {
-                	System.out.println("open root directory");
-              		this.doWork(container, password, "/", "opendir");
+                	//System.out.println("open root directory");
+              		this.doWork(container, password.getBytes(), "/", "opendir");
                 }
+                
+                
+                //this.doWork("/home/rab/shared/containers/con512", "welcome1".getBytes(), "/", "opendir");
          } catch (org.apache.commons.cli.ParseException e) {
             System.out.println(e.getMessage());
             formatter.printHelp("Encryption Utility", options);
@@ -123,31 +127,30 @@ public class EncReaderApplication implements CommandLineRunner {
         }
 	}
 
-	private void doWork(String container, String password, String target, String action) {
-
-		System.out.println("Starting");
+	private void doWork(String container, byte[] password, String target, String action) {
 
 		RandomAccessIO io;
 		StdFs stdFs = StdFs.getStdFs();
 		EdsContainer cnt; // = null;
 		try {
 			StdLayout stdl = new StdLayout();
+			stdl.setPassword(password);
 			stdl.initNew();
-			io = new StdFsFileIO(new File("/home/rab/shared/tcontainers/con1"), AccessMode.Read);
-			if (stdl.readHeader(io)) {
-				System.out.println("Read header successfully!");
-			} else {
-				System.out.println("Read header error!!");
+			io = new StdFsFileIO(new File(container), AccessMode.Read);
+			if (!stdl.readHeader(io, password)) {
+				System.out.println("Cannot encrypt container " + container);
+				io.close();		
+				System.exit(1);
 			}
-			io.close();
-
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+			
+		try {			
 			FileSystem _fileSystem = null;
 			if (_fileSystem == null) {
-				System.out.println("--- start proto ---");
-				// cnt = new
-				// EdsContainer(stdFs.getPath("/home/rab/shared/econtainers/con1.eds"));
-				cnt = new EdsContainer(stdFs.getPath("/home/rab/shared/tcontainers/con3"));
-
+				cnt = new EdsContainer(stdFs.getPath(container));
 				cnt.setContainerFormat(null);
 				cnt.setEncryptionEngineHint(null);
 				cnt.setHashFuncHint(null);
@@ -157,13 +160,12 @@ public class EncReaderApplication implements CommandLineRunner {
 				if (cfi != null) {
 					cnt.setContainerFormat(cfi);
 					VolumeLayout vl = cfi.getVolumeLayout();
-					String name = "aes-xts-plain64"; // getExternalSettings().getEncEngineName();
+					String name = ""; //"aes-xts-plain64"; // getExternalSettings().getEncEngineName();
 
 					if (name != null && !name.isEmpty())
 						cnt.setEncryptionEngineHint((FileEncryptionEngine) VolumeLayoutBase
 								.findEncEngineByName(vl.getSupportedEncryptionEngines(), name));
-
-					name = "SHA-512"; // getExternalSettings().getHashFuncName();
+					name = ""; //"SHA-512"; // getExternalSettings().getHashFuncName();
 
 					if (name != null && !name.isEmpty())
 						cnt.setHashFuncHint(VolumeLayoutBase.findHashFunc(vl.getSupportedHashFuncs(), name));
@@ -172,81 +174,80 @@ public class EncReaderApplication implements CommandLineRunner {
 				int numKDFIterations = 0; // getSelectedKDFIterations();
 				if (numKDFIterations > 0)
 					cnt.setNumKDFIterations(numKDFIterations);
-				byte[] pass = "welcome1".getBytes(); // getFinalPassword();
-
+				byte[] pass = password; // getFinalPassword();
 				try {
 					cnt.open(pass);
 					RandomAccessIO eio = cnt.getEncryptedFile(true);
 					FatFS ffs = FatFS.getFat(eio);
 					Object opTag = new Object();
-					Path fp = ffs.getPath("/test1");
+					Path fp;
+					if(action.equals("opendir")) {
+						fp = ffs.getPath(target);				
+					}else {
+						//System.out.println(Paths.get(target).getParent().toString());
+						fp = ffs.getPath(Paths.get(target).getParent().toString());										
+					}
 					FatFS.FatDirectory fd = ffs.new FatDirectory((FatPath) fp);
 
-					System.out.println(fd.getName());
-					System.out.println(fd.getTotalSpace());
-					System.out.println(fd.getCreateDate());
+					//System.out.println(fd.getName());
+					//System.out.println(fd.getTotalSpace());
+					//System.out.println(fd.getCreateDate());
 
 					Contents dirReader = fd.list();
-
-					for (Path p : dirReader) {
-						FatFS.FatDirectory fdtemp = ffs.new FatDirectory((FatPath) p);
-						System.out.print(fdtemp.getName() + "\t");
-						if (p.isDirectory()) {
-							System.out.print("DIRETORY\t");
-						} else {
-							System.out.print("FILE\t");
-
-							if (fdtemp.getName().equals("error_log_tak--off")) {
-
-								System.out.println();
-
-								InputStream in = p.getFile().getInputStream();
-
-								InputStreamReader isReader = new InputStreamReader(in);
-								// Creating a BufferedReader object
-								BufferedReader reader = new BufferedReader(isReader);
-								// StringBuffer sb = new StringBuffer();
-								String str;
-								while ((str = reader.readLine()) != null) {
-									// sb.append(str);
-									System.out.println(str);
-								}
-
-								// System.out.print("\n"+ sb.toString() +"\n");
-
+					
+					if(action.equals("opendir")) {
+						for (Path p : dirReader) {
+							FatFS.FatDirectory fdtemp = ffs.new FatDirectory((FatPath) p);
+							System.out.print(fdtemp.getName() + "\t");
+							//System.out.print(p.getFile().getName() + "\t");
+							if (p.isDirectory()) {
+								System.out.print("DIRETORY\t");
+							} else {
+								System.out.print("FILE\t");
 							}
-						}
-						System.out.print(fd.getTotalSpace() + "\t");
-						SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-d");
-						SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
-						System.out.print(date.format(fd.getCreateDate()) + "\t");
-						System.out.print(time.format(fd.getCreateDate()) + "\n");
-					}
+							System.out.print(fd.getTotalSpace() + "\t");
+							SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-d");
+							SimpleDateFormat time = new SimpleDateFormat("HH:mm:ss");
+							System.out.print(date.format(fd.getCreateDate()) + "\t");
+							System.out.print(time.format(fd.getCreateDate()) + "\n");
+						}	
+						
+					}else {
+						
+						for (Path p : dirReader) {
+							FatFS.FatDirectory fdtemp = ffs.new FatDirectory((FatPath) p);
+							//System.out.print(fdtemp.getName() + "\t");
+							//System.out.print(p.getFile().getName() + "\t");
+							
+							if (p.isFile()) {
+								if (fdtemp.getName().equals(Paths.get(target).getFileName().toString())) {
 
-					System.out.println("--- end proto ---");
+				//					System.out.println();
+
+									InputStream in = p.getFile().getInputStream();
+									InputStreamReader isReader = new InputStreamReader(in);
+									// Creating a BufferedReader object
+									BufferedReader reader = new BufferedReader(isReader);
+									StringBuffer sb = new StringBuffer();
+									String str;
+									while ((str = reader.readLine()) != null) {
+										//sb.append(str);
+										System.out.println(str);
+									}
+
+									// System.out.print("\n"+ sb.toString() +"\n");
+									break;
+								}
+							}
+						}		
+					}
 				} catch (FileInUseException e) {
 					System.out.println(e);
 				}
-				System.out.println("check");
 			}
-
-			// FileSystem fs = getEncryptedFS(true);
-
-			// return fs;
-
 		} catch (IOException | ApplicationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-		try {
-			// cw.open();
-			System.out.println("\nworking");
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 	}
 }

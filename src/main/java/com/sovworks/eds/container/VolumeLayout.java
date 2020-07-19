@@ -16,7 +16,7 @@ public interface VolumeLayout extends EncryptedFileLayout
 
     void initNew();
 
-    boolean readHeader(RandomAccessIO input) throws IOException, ApplicationException;
+    boolean readHeader(RandomAccessIO input, byte[] password) throws IOException, ApplicationException;
 
     void writeHeader(RandomAccessIO output) throws  IOException, ApplicationException;
 

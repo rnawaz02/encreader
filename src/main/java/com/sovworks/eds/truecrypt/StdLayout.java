@@ -34,7 +34,7 @@ public class StdLayout extends VolumeLayoutBase
 	
 	public static final int HEADER_SIZE = 64*1024;
 	protected static final int SECTOR_SIZE = 512;
-	protected byte[] _password = "welcome1".getBytes();
+	protected byte[] _password;
 
 
  //   protected FileEncryptionEngine _encEngine;
@@ -56,11 +56,6 @@ public class StdLayout extends VolumeLayoutBase
 	protected long _encryptedAreaStart, _volumeSize,_inputSize; 
 
 
-	
-	
-	/*
-    protected byte[] _password ="welcome1".getBytes();
-*/
 	public StdLayout()
 	{
 		_encryptedAreaStart = 2*HEADER_SIZE;
@@ -95,9 +90,10 @@ public class StdLayout extends VolumeLayoutBase
 	}
 	
 	@Override
-	public boolean readHeader(RandomAccessIO input) throws IOException, ApplicationException
-	{   	
-		//checkReadHeaderPrereqs();
+	public boolean readHeader(RandomAccessIO input, byte[] password) throws IOException, ApplicationException
+	{   
+		_password = password;
+		checkReadHeaderPrereqs();
 		_inputSize = input.length();
 		input.seek(getHeaderOffset());				
 		int hs = getEffectiveHeaderSize();
@@ -258,9 +254,16 @@ public class StdLayout extends VolumeLayoutBase
 	
 	protected FileEncryptionEngine tryHashFunc(byte[] encryptedHeaderData, byte[] salt, MessageDigest hashFunc) throws ApplicationException
 	{
+		_hashFunc = hashFunc;
 		KeyHolder prevKey = new KeyHolder();
 		try
 		{
+			for(FileEncryptionEngine ee: getSupportedEncryptionEngines())
+            { 
+				if(tryEncryptionEngine(encryptedHeaderData, salt, hashFunc, ee, prevKey))
+					return ee;					
+            }
+			/*
 			if(_encEngine!=null)
 			{
 				if(tryEncryptionEngine(encryptedHeaderData, salt, hashFunc, _encEngine, prevKey))
@@ -275,6 +278,7 @@ public class StdLayout extends VolumeLayoutBase
 						return ee;					
 	            }
 			}
+			*/
 			
 		}
 		finally

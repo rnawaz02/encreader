@@ -228,14 +228,14 @@ public abstract class EdsContainerBase implements Closeable {
 		vl.setPassword(cutPassword(password, cf.getMaxPasswordLength()));
 		if (cf.hasCustomKDFIterationsSupport() && _numKDFIterations > 0)
 			vl.setNumKDFIterations(_numKDFIterations);
-		if (vl.readHeader(containerFile)) {
+		if (vl.readHeader(containerFile, password)) {
 			_containerFormat = cf;
 			_layout = vl;
 			return true;
 		} else if (isHidden && (_encryptionEngine != null || _messageDigest != null)) {
 			vl.setEngine(null);
 			vl.setHashFunc(null);
-			if (vl.readHeader(containerFile)) {
+			if (vl.readHeader(containerFile, password)) {
 				_containerFormat = cf;
 				_layout = vl;
 				return true;
