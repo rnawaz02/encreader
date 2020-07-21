@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cmake CMakeLists.txt
+make
+rm -f src/main/resources/*
+mv -f *.so src/main/resources/

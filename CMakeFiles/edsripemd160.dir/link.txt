@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libedsripemd160.so -o libedsripemd160.so CMakeFiles/edsripemd160.dir/src/main/native/ripemd160/edsripemd160.c.o 

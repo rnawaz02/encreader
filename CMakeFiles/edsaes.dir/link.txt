@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libedsaes.so -o libedsaes.so CMakeFiles/edsaes.dir/src/main/native/aes/edsaes.c.o CMakeFiles/edsaes.dir/src/main/native/aes/aescrypt.c.o CMakeFiles/edsaes.dir/src/main/native/aes/aeskey.c.o CMakeFiles/edsaes.dir/src/main/native/aes/aestab.c.o 

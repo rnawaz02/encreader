@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libedscfb.so -o libedscfb.so CMakeFiles/edscfb.dir/src/main/native/cfb/edscfb.c.o 

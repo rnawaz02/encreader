@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libedsxts.so -o libedsxts.so CMakeFiles/edsxts.dir/src/main/native/xts/edsxts.c.o 

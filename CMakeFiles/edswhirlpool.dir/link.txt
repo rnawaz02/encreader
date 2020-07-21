@@ -1,0 +1,1 @@
+/usr/bin/cc -fPIC   -shared -Wl,-soname,libedswhirlpool.so -o libedswhirlpool.so CMakeFiles/edswhirlpool.dir/src/main/native/whirlpool/edswhirlpool.c.o CMakeFiles/edswhirlpool.dir/src/main/native/whirlpool/whirlpool.c.o 

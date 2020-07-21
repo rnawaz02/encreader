@@ -1,0 +1,46 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/rab/sandbox/encreader/src/main/native/gost/com_sovworks_eds_crypto_blockciphers_GOST.h
+jni.h
+-
+
+/home/rab/sandbox/encreader/src/main/native/gost/edsgost.c
+com_sovworks_eds_crypto_blockciphers_GOST.h
+/home/rab/sandbox/encreader/src/main/native/gost/com_sovworks_eds_crypto_blockciphers_GOST.h
+stdlib.h
+-
+malloc.h
+-
+block_cipher.h
+-
+gost89.h
+/home/rab/sandbox/encreader/src/main/native/gost/gost89.h
+
+/home/rab/sandbox/encreader/src/main/native/gost/gost89.c
+string.h
+-
+gost89.h
+/home/rab/sandbox/encreader/src/main/native/gost/gost89.h
+
+/home/rab/sandbox/encreader/src/main/native/gost/gost89.h
+
+/usr/lib/jvm/java-11-openjdk-amd64/include/jni.h
+stdio.h
+-
+stdarg.h
+-
+jni_md.h
+/usr/lib/jvm/java-11-openjdk-amd64/include/jni_md.h
+
+/usr/lib/jvm/java-11-openjdk-amd64/include/linux/jni_md.h
+
+src/main/native/crypto/block_cipher.h
+stdint.h
+-
+
