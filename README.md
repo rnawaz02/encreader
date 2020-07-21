@@ -1,7 +1,9 @@
 # Encreader
-Command Line Encryption Utility based on Java and C extended from edslite. Repository is cloned from [edslite](https://github.com/sovworks/edslite) which is an android application and build for Linux OS. It allows you to decrypt files encrypted using trucrypt from a command line.
+Command Line Encryption Utility based on Java and C extended from edslite. Repository is cloned from [edslite](https://github.com/sovworks/edslite) which is an android application and build for Linux OS. It allows you to decrypt files encrypted using trucrypt from a command line.  
+
 # Build Instructions
-Clone repository and simply run
+
+Clone repository and simply run following code inside it
 
 `mvn clean package`
 
@@ -31,3 +33,29 @@ To see contents of a file inside an encrypted container.
 `java -jar target/encreader-0.0.1-SNAPSHOT.jar -f /path/to/encrypted/container/file.anyextension -pw password -of /folder/inside/file.etc`  
 
 # Build Instructions for C
+
+Incase if you are having difficulties to run pre-build C libraries or want to run code on other operating system you have to compile C code included in the folder named native. 
+Follwoing operating system was used to create these instructions.  
+`cat /etc/os-release`   
+***PRETTY_NAME="Debian GNU/Linux 10 (buster)"  
+NAME="Debian GNU/Linux"  
+VERSION_ID="10"  
+VERSION="10 (buster)"  
+VERSION_CODENAME=buster  
+ID=debian  
+HOME_URL="https://www.debian.org/"  
+SUPPORT_URL="https://www.debian.org/support"  
+BUG_REPORT_URL="https://bugs.debian.org/"***    
+ 
+cmake (VERSION 3.4.1) or higher is required to build C code. You need to run following two commands to create *.so files.  
+
+`cmake CMakeLists.txt`  
+`make`
+`rm -f src/main/resources/*`
+`mv -f *.so src/main/resources/`
+
+Make sure that both commands are completed successfully.
+
+If there are errors pointing to some missing dependencies please install them before retrying.
+
+Next recreate jar file by running `mvn clean package` and you are good to go. Run new jar file using run instructions above
