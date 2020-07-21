@@ -51,7 +51,7 @@ cmake (VERSION 3.4.1) or higher is required to build C code. You need to run fol
 
 `cmake CMakeLists.txt`   
 `make`  
-`rm -f src/main/resources/*`   
+`rm -f src/main/resources/*.so`   
 `mv -f *.so src/main/resources/`  
 
 Make sure that both commands are completed successfully.
