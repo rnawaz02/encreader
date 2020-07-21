@@ -2,6 +2,6 @@
 
 cmake CMakeLists.txt
 make
-rm -f src/main/resources/*
+rm -f src/main/resources/*.so
 mv -f *.so src/main/resources/
 mvn clean package

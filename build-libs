@@ -2,5 +2,5 @@
 
 cmake CMakeLists.txt
 make
-rm -f src/main/resources/*
+rm -rf src/main/resources/*.so
 mv -f *.so src/main/resources/
