@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC   -shared -Wl,-soname,libedscbc.so -o libedscbc.so CMakeFiles/edscbc.dir/src/main/native/cbc/edscbc.c.o 

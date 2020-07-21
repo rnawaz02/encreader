@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC   -shared -Wl,-soname,libedsgost.so -o libedsgost.so CMakeFiles/edsgost.dir/src/main/native/gost/edsgost.c.o CMakeFiles/edsgost.dir/src/main/native/gost/gost89.c.o 

@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC   -shared -Wl,-soname,liblocalxts.so -o liblocalxts.so CMakeFiles/localxts.dir/src/main/native/localxts/localxts.c.o -Wl,-rpath,/home/rab/sandbox/encreader libedsxts.so 

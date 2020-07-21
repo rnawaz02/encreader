@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC   -shared -Wl,-soname,libedsctr.so -o libedsctr.so CMakeFiles/edsctr.dir/src/main/native/ctr/edsctr.c.o 

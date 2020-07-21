@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC   -shared -Wl,-soname,libedstwofish.so -o libedstwofish.so CMakeFiles/edstwofish.dir/src/main/native/twofish/edstwofish.c.o CMakeFiles/edstwofish.dir/src/main/native/twofish/twofish.c.o 
