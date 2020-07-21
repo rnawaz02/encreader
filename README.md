@@ -49,13 +49,15 @@ BUG_REPORT_URL="https://bugs.debian.org/"***
  
 cmake (VERSION 3.4.1) or higher is required to build C code. You need to run following two commands to create *.so files.  
 
-`cmake CMakeLists.txt`  
-`make`
-`rm -f src/main/resources/*`
-`mv -f *.so src/main/resources/`
+`cmake CMakeLists.txt`   
+`make`  
+`rm -f src/main/resources/*`   
+`mv -f *.so src/main/resources/`  
 
 Make sure that both commands are completed successfully.
 
 If there are errors pointing to some missing dependencies please install them before retrying.
 
-Next recreate jar file by running `mvn clean package` and you are good to go. Run new jar file using run instructions above
+Next recreate jar file by running `mvn clean package` and you are good to go. Run new jar file using run instructions above.
+
+You can also run these commands at once by running included script `build-libs` to build labs or `build-package` to create new libs and jar package together
